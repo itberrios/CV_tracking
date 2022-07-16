@@ -9,7 +9,7 @@ https://user-images.githubusercontent.com/60835780/179359520-586c8f22-ba03-4ff9-
 
 
 
-This is a more complex scenario of vehicles and pedestrians. The Kalman Filter is not as robust in this scenario as some tracks tend to wander off without a match for a few frames (becoming false tracks). (top - Hungarian, bottom - Hungarian + Kalman Filter). Even though the Kalman Filter is able to extrapolate better, it leads to more false tracks as opposed to more reidentifications. This shows how complex the multiple object tracking problem can be, the kalman filter and tracking parameters can be tuned to this situation, but it may not be very helpful outside of this specific type of scenario.
+This is a more complex scenario of vehicles and pedestrians. The Kalman Filter is not as robust in this scenario as some tracks tend to wander off without a match for a few frames (becoming false tracks). (top - Hungarian, bottom - Hungarian + Kalman Filter). Even though the Kalman Filter is able to extrapolate better, it leads to more false tracks as opposed to more reidentifications. This shows how complex the multiple object tracking problem can be, the kalman filter and tracking parameters can be tuned to this situation, but it may not be very helpful outside of this specific type of scenario. An update to improve the visual appearance would be to not draw the box after a certain amount of frames, this would hide the wandering false tracks and still give the algoirthma  chance to redetect a matching track without reidentification. The boxes remain drawn on this video since they provide a good insight as to how the algorithm is performing.
 
 https://user-images.githubusercontent.com/60835780/179359657-8a6dbf1c-42ee-4993-99b8-5e4bfeb55f1e.mp4
 
