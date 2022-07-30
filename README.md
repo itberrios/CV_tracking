@@ -12,6 +12,7 @@ https://user-images.githubusercontent.com/60835780/179360230-e5ce0169-6bab-4e5a-
 
 
 This is a more complex video dataset with pedestrains and vehicles. In this case the constant velocity model in the Kalman Filter is not able to improve tracking and actually degrades it.
+
 https://user-images.githubusercontent.com/60835780/179360234-3d301030-9b32-4abd-afc5-b083a53228d3.mp4
 
 
