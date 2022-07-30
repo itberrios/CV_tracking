@@ -1,10 +1,5 @@
-# CV_projects
-
-##### Dataset sources
-https://www.aicrowd.com/challenges/airborne-object-tracking-challenge
-
-http://www.cvlibs.net/datasets/kitti/eval_tracking.php (kitti)
-
+# Computer Vision Tracking
+This repo contains various Computer Vision tracking projects
 
 # Project results
 
@@ -16,4 +11,7 @@ https://user-images.githubusercontent.com/60835780/179360230-e5ce0169-6bab-4e5a-
 https://user-images.githubusercontent.com/60835780/179360234-3d301030-9b32-4abd-afc5-b083a53228d3.mp4
 
 
+##### Dataset sources
+https://www.aicrowd.com/challenges/airborne-object-tracking-challenge
 
+http://www.cvlibs.net/datasets/kitti/eval_tracking.php (kitti)
