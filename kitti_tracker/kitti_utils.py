@@ -27,10 +27,10 @@ def get_oxts(oxt_path):
 # ============================================================================================
 # file access functions
 
-def bin2xyzw(lidar_bin, remove_plane=False):
+def bin2xyzw(bin_path, remove_plane=False):
     ''' Reads LiDAR bin file and returns homogeneous (x,y,z,1) LiDAR points'''
     # read in LiDAR data
-    scan_data = np.fromfile(lidar_bin, dtype=np.float32).reshape((-1,4))
+    scan_data = np.fromfile(bin_path, dtype=np.float32).reshape((-1,4))
 
     # get x,y,z LiDAR points (x, y, z) --> (front, left, up)
     xyz = scan_data[:, 0:3] 
@@ -91,9 +91,10 @@ def get_rigid_transformation(calib_path):
 # ============================================================================================
 # coordiante transformations
 
-def xyz2camera(xyz, T, image=None, remove_outliers=True):
-    ''' maps xyx points to camera (u,v,z) space. The xyz points can either be velo/LiDAR or GPS/IMU, 
-        the difference will be marked by the transformation matrix T.
+def xyzw2camera(xyz, T, image=None, remove_outliers=True):
+    ''' maps xyxw homogeneous points to camera (u,v,z) space. The xyz points can 
+        either be velo/LiDAR or GPS/IMU, the difference will be marked by the 
+        transformation matrix T.
         '''
     # convert to (left) camera coordinates
     camera =  T_mat @ xyz
@@ -117,6 +118,19 @@ def xyz2camera(xyz, T, image=None, remove_outliers=True):
 
 # ============================================================================================
 # pipeline functions
+
+def project_velobin2uvz(bin_path, T_uv_velo, image, remove_plane=True):
+    ''' Projects LiDAR point cloud onto the image coordinate frame (u, v, z)
+        '''
+
+    # get homogeneous LiDAR points from bin file
+    xyzw = bin2xyzw(bin_path, remove_plane)
+
+    # project velo (x, z, y, w) onto camera (u, v, z) coordinates
+    velo_uvz = xyzw2camera(velo_points, T_uv_velo, image, remove_outliers=True)
+    
+    return velo_uvz
+
 
 def get_distances(image, velo_uvz, bboxes, draw=True):
     ''' Obtains distance measurements for each detected object in the image 
