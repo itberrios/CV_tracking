@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import torch
 from sklearn import linear_model
+import pymap3d as pm
 
 
 def test_func(a, b):
@@ -116,6 +117,31 @@ def xyzw2camera(xyz, T, image=None, remove_outliers=True):
         camera = np.delete(camera, np.where(outlier), axis=1)
 
     return camera
+
+
+def transform_uvz(uvz, T):
+    ''' Transforms the uvz coordinates to xyz coordinates. The xyz coordinate
+        frame is specified by the transformation matrix T. The transformation
+        may include:
+            uvz -> xyz (LiDAR)
+            uvz -> xyz (IMU)
+
+        Inputs: uvz (Nx3) array of uvz coordinates
+        Outputs: xyz (Nx3) array of xyz coordinates
+        '''
+    # covnert to homogeneous representation
+    uvzw = np.hstack((uvz[:, :2] * uvz[:, 2][:, None], 
+                      uvz[:, 2][:, None],
+                      np.ones((len(uvz[:, :3]), 1))))
+    
+    # perform homogeneous transformation
+    xyzw = T @ uvzw.T
+    
+    # get xyz coordinates
+    xyz = xyzw[:3, :].T
+
+    return xyz
+
 
 
 # ============================================================================================
