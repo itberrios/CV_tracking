@@ -168,7 +168,7 @@ def draw_velo_on_image(velo_uvz, image, color_map=get_color):
 # ============================================================================================
 # pipeline functions place these in KITTI LIDAR utils
 
-def project_velobin2uvz(bin_path, T_uv_velo, image, remove_plane=True):
+def project_velobin2uvz(bin_path, T_uvz_velo, image, remove_plane=True):
     ''' Projects LiDAR point cloud onto the image coordinate frame (u, v, z)
         '''
 
@@ -176,7 +176,7 @@ def project_velobin2uvz(bin_path, T_uv_velo, image, remove_plane=True):
     xyzw = bin2xyzw(bin_path, remove_plane)
 
     # project velo (x, z, y, w) onto camera (u, v, z) coordinates
-    velo_uvz = xyzw2camera(xyzw, T_uv_velo, image, remove_outliers=True)
+    velo_uvz = xyzw2camera(xyzw, T_uvz_velo, image, remove_outliers=True)
     
     return velo_uvz
 
