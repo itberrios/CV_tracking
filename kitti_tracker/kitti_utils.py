@@ -2,6 +2,7 @@
 This script contains various utility functions for working with the KITTI dataset
 '''
 import os
+import cv2
 import numpy as np
 from sklearn import linear_model
 
