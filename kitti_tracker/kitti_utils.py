@@ -116,8 +116,30 @@ def xyzw2camera(xyz, T, image=None, remove_outliers=True):
 
     return camera
 
+
 # ============================================================================================
-# pipeline functions
+# plotting functions (place these in KITTI plot utils
+from matplotlib import cm
+
+# get color map function
+rainbow_r = cm.get_cmap('rainbow_r', lut=100)
+get_color = lambda z : [255*val for val in rainbow_r(int(z.round()))[:3]]
+
+def draw_velo_on_image(velo_uvz, image, color_map=get_color):
+   
+    # unpack LiDAR points
+    u, v, z = velo_uvz
+
+    # draw LiDAR point cloud on blank image
+    for i in range(len(u)):
+        cv2.circle(velo_image, (int(u[i]), int(v[i])), 1, 
+                  color_map(z[i]), -1);
+
+    return velo_image
+
+
+# ============================================================================================
+# pipeline functions place these in KITTI LIDAR utils
 
 def project_velobin2uvz(bin_path, T_uv_velo, image, remove_plane=True):
     ''' Projects LiDAR point cloud onto the image coordinate frame (u, v, z)
