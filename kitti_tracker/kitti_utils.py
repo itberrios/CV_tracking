@@ -155,8 +155,9 @@ def project_velobin2uvz(bin_path, T_uv_velo, image, remove_plane=True):
     return velo_uvz
 
 
-def get_velo_distances(image, velo_uvz, bboxes, draw=True):
-    ''' Obtains distance measurements for each detected object in the image 
+def get_velo_xyz(image, velo_uvz, bboxes, draw=True):
+    ''' Obtains LiDAR xyz measurements for each detected object in the image,
+        also gets the LiDAR xyz projected onto the camera reference frame as uvz 
         Inputs:
           image - input image for detection 
           velo_uvz - LiDAR coordinates projected to camera reference
@@ -165,13 +166,15 @@ def get_velo_distances(image, velo_uvz, bboxes, draw=True):
         Outputs:
           image - input image with distances drawn at the center of each 
                   bounding box
+          bboxes_out - bboxes with velo (u,v,z) and (x,y,z) object centers
+                  added to the array
         '''
 
     # unpack LiDAR camera coordinates
     u, v, z = velo_uvz
 
     # get new output
-    bboxes_out = np.zeros((bboxes.shape[0], bboxes.shape[1] + 3))
+    bboxes_out = np.zeros((bboxes.shape[0], bboxes.shape[1] + 6))
     bboxes_out[:, :bboxes.shape[1]] = bboxes
 
     # iterate through all detected bounding boxes
@@ -180,27 +183,37 @@ def get_velo_distances(image, velo_uvz, bboxes, draw=True):
         pt2 = torch.round(bbox[2:4]).to(torch.int).numpy()
 
         # get center location of the object on the image
-        x_center = (pt1[1] + pt2[1]) / 2
-        y_center = (pt1[0] + pt2[0]) / 2
+        obj_x_center = (pt1[1] + pt2[1]) / 2
+        obj_y_center = (pt1[0] + pt2[0]) / 2
 
         # now get the closest LiDAR points to the center
         center_delta = np.abs(np.array((v, u)) 
-                              - np.array([[x_center, y_center]]).T)
+                              - np.array([[obj_x_center, obj_y_center]]).T)
         
         # choose coordinate pair with the smallest L2 norm
         min_loc = np.argmin(np.linalg.norm(center_delta, axis=0))
 
         # get LiDAR location in image/camera space
         velo_depth = z[min_loc]; # LiDAR depth in camera space
-        velo_location = np.array([v[min_loc], u[min_loc], velo_depth])
+        velo_uvz_location = np.array([v[min_loc], u[min_loc], velo_depth])
 
-        # add velo (u, v, z) to bboxes
-        bboxes_out[i, -3:] = velo_location
+        # convert uvz location to LiDAR xyz location
+        velo_uvzw_location = np.hstack((velo_uvz_location[:2] * velo_uvz_location[2],
+                                        velo_uvz_location[2],
+                                        1))[:, None]
+        velo_xyzw = T_uvz_velo_inv @ velo_uvzw_location
+
+        # add velo (u, v, z) to bboxes 
+        bboxes_out[i, -6:-3] = velo_uvz_location
+
+        # add velo (x, y, z) to bboxes
+        bboxes_out[i, -3:] = velo_xyzw[:3].squeeze()
 
         # draw depth on image at center of each bounding box
+        # This is depth as perceived by the camera
         if draw:
-            object_center = (np.round(y_center).astype(int), 
-                             np.round(x_center).astype(int))
+            object_center = (np.round(obj_y_center).astype(int), 
+                             np.round(obj_x_center).astype(int))
             cv2.putText(image, 
                         '{0:.2f} m'.format(velo_depth), 
                         object_center,
