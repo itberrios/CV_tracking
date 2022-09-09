@@ -132,7 +132,7 @@ def project_velobin2uvz(bin_path, T_uv_velo, image, remove_plane=True):
     return velo_uvz
 
 
-def get_distances(image, velo_uvz, bboxes, draw=True):
+def get_velo_distances(image, velo_uvz, bboxes, draw=True):
     ''' Obtains distance measurements for each detected object in the image 
         Inputs:
           image - input image for detection 
