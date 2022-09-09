@@ -11,10 +11,10 @@ def test_func(a, b):
 
 def get_oxts(oxt_path):
     ''' Obtains the oxt info from a single oxt path '''
-    with open(oxts_data_paths[0]) as f:
+    with open(oxt_path) as f:
         oxts = f.readlines()
         
     oxts = oxts[0].strip().split(' ')
     oxts = np.array(oxts).astype(float)
-
+    
     return oxts
