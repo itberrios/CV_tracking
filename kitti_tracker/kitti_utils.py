@@ -4,6 +4,7 @@ This script contains various utility functions for working with the KITTI datase
 import os
 import cv2
 import numpy as np
+import torch
 from sklearn import linear_model
 
 
