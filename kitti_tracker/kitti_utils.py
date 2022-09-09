@@ -133,10 +133,10 @@ def draw_velo_on_image(velo_uvz, image, color_map=get_color):
 
     # draw LiDAR point cloud on blank image
     for i in range(len(u)):
-        cv2.circle(velo_image, (int(u[i]), int(v[i])), 1, 
-                  color_map(z[i]), -1);
+        cv2.circle(image, (int(u[i]), int(v[i])), 1, 
+                   color_map(z[i]), -1);
 
-    return velo_image
+    return image
 
 
 # ============================================================================================
