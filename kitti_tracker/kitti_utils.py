@@ -97,7 +97,7 @@ def xyzw2camera(xyz, T, image=None, remove_outliers=True):
         transformation matrix T.
         '''
     # convert to (left) camera coordinates
-    camera =  T_mat @ xyz
+    camera =  T @ xyz
 
     # delete negative camera points
     camera  = np.delete(camera , np.where(camera [2,:] < 0)[0], axis=1) 
