@@ -127,7 +127,7 @@ def project_velobin2uvz(bin_path, T_uv_velo, image, remove_plane=True):
     xyzw = bin2xyzw(bin_path, remove_plane)
 
     # project velo (x, z, y, w) onto camera (u, v, z) coordinates
-    velo_uvz = xyzw2camera(velo_points, T_uv_velo, image, remove_outliers=True)
+    velo_uvz = xyzw2camera(xyzw, T_uv_velo, image, remove_outliers=True)
     
     return velo_uvz
 
