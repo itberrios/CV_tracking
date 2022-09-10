@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import torch
 from sklearn import linear_model
-import pymap3d as pm
+# import pymap3d as pm
 
 
 def test_func(a, b):
