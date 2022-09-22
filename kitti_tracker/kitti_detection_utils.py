@@ -103,7 +103,7 @@ def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_dept
     # get LiDAR points and transform them to image/camera space
     velo_uvz = project_velobin2uvz(bin_path, 
                                    T_velo_cam2, 
-                                   left_image, 
+                                   image, 
                                    remove_plane=True)
 
     # get uvz centers for detected objects
