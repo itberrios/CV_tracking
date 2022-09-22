@@ -70,7 +70,7 @@ def get_uvz_centers(image, velo_uvz, bboxes, draw=True):
 
   
   
-  def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_depth=True):
+def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_depth=True):
     ''' Obtains detections for the input image, along with the coordinates of 
         the detected object centers. The coordinate obtained are:
             - Camera with depth --> uvz 
