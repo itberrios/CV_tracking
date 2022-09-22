@@ -72,7 +72,7 @@ def get_uvz_centers(image, velo_uvz, bboxes, draw=True):
 
   
   
-def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_depth=True):
+def get_detection_coordinates(image, bin_path, model, T_velo_cam2, draw_boxes=True, draw_depth=True):
     ''' Obtains detections for the input image, along with the coordinates of 
         the detected object centers. The coordinate obtained are:
             - Camera with depth --> uvz 
@@ -81,6 +81,7 @@ def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_dept
         Inputs:
             image - rgb image to run detection on
             bin_path - path to LiDAR bin file
+            T_velo_cam2 - transformation from LiDAR to camera2 (u,v,z) space
             model - detection model (this functions assumes a yolo5 model)
                   - any detector can be used as long as it has the following attributes:
                     show, xyxy
@@ -116,7 +117,7 @@ def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_dept
   
   
   
-def get_imu_xyz(left_image, bin_path, model, T_cam2_imu):
+def get_imu_xyz(left_image, bin_path, model, T_velo_cam2, T_cam2_imu):
      ''' Obtains (x,y,z) location referenced to IMU '''
      # get detections and object centers in uvz
      bboxes, velo_uvz = get_detection_coordinates(left_image, bin_path, model)
