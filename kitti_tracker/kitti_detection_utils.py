@@ -116,7 +116,7 @@ def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_dept
   
   
   
-  def get_imu_xyz(left_image, bin_path, model, T_cam2_imu):
+def get_imu_xyz(left_image, bin_path, model, T_cam2_imu):
      ''' Obtains (x,y,z) location referenced to IMU '''
      # get detections and object centers in uvz
      bboxes, velo_uvz = get_detection_coordinates(left_image, bin_path, model)
