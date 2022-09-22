@@ -91,7 +91,7 @@ def get_detection_coordinates(image, bin_path, model, draw_boxes=True, draw_dept
                           listed above
         '''
     ## 1. compute detections in the left image
-    detections = model(left_image)
+    detections = model(image)
 
     # draw boxes on image
     if draw_boxes:
