@@ -2,7 +2,9 @@
 Script that contains various detection functions for the KITTI dataset
 '''
 
+import cv2
 import numpy as np
+import torch
 from kitti_utils import *
 
 
