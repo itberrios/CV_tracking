@@ -72,7 +72,7 @@ def get_uvz_centers(image, velo_uvz, bboxes, draw=True):
 
   
   
-def get_detection_coordinates(image, bin_path, model, T_velo_cam2, draw_boxes=True, draw_depth=True):
+def get_detection_coordinates(image, bin_path, model, T_velo_cam, draw_boxes=True, draw_depth=True):
     ''' Obtains detections for the input image, along with the coordinates of 
         the detected object centers. The coordinate obtained are:
             - Camera with depth --> uvz 
@@ -81,7 +81,7 @@ def get_detection_coordinates(image, bin_path, model, T_velo_cam2, draw_boxes=Tr
         Inputs:
             image - rgb image to run detection on
             bin_path - path to LiDAR bin file
-            T_velo_cam2 - transformation from LiDAR to camera2 (u,v,z) space
+            T_velo_cam - transformation from LiDAR to camera## (u,v,z) space
             model - detection model (this functions assumes a yolo5 model)
                   - any detector can be used as long as it has the following attributes:
                     show, xyxy
@@ -103,7 +103,7 @@ def get_detection_coordinates(image, bin_path, model, T_velo_cam2, draw_boxes=Tr
 
     # get LiDAR points and transform them to image/camera space
     velo_uvz = project_velobin2uvz(bin_path, 
-                                   T_velo_cam2, 
+                                   T_velo_cam, 
                                    image, 
                                    remove_plane=True)
 
@@ -117,15 +117,18 @@ def get_detection_coordinates(image, bin_path, model, T_velo_cam2, draw_boxes=Tr
   
   
   
-def get_imu_xyz(left_image, bin_path, model, T_velo_cam2, T_cam2_imu):
-     ''' Obtains (x,y,z) location referenced to IMU '''
+def get_imu_xyz(image, bin_path, model, T_velo_cam, T_cam_imu):
+     ''' Obtains (x,y,z) location referenced to IMU 
+         Camera reference specified by image and Transformation Matrices, 
+         Can use any camera as the reference
+         '''
      # get detections and object centers in uvz
-     bboxes, velo_uvz = get_detection_coordinates(left_image, bin_path, model)
+     bboxes, velo_uvz = get_detection_coordinates(image, bin_path, model, T_velo_cam)
 
      # get transformed coordinates of object centers
      uvz = bboxes[:, -3:]
 
      # transform to IMU (u,v,z)
-     imu_xyz = transform_uvz(uvz, T_cam2_imu)
+     imu_xyz = transform_uvz(uvz, T_cam_imu)
       
      return imu_xyz
