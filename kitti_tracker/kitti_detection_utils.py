@@ -123,7 +123,11 @@ def get_imu_xyz(image, bin_path, model, T_velo_cam, T_cam_imu):
          Can use any camera as the reference
          '''
      # get detections and object centers in uvz
-     bboxes, velo_uvz = get_detection_coordinates(image, bin_path, model, T_velo_cam)
+     bboxes, velo_uvz = get_detection_coordinates(image, 
+                                                  bin_path, 
+                                                  model, 
+                                                  T_velo_cam,
+                                                  draw_boxes=False)
 
      # get transformed coordinates of object centers
      uvz = bboxes[:, -3:]
