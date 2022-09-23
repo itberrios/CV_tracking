@@ -127,7 +127,8 @@ def get_imu_xyz(image, bin_path, model, T_velo_cam, T_cam_imu):
                                                   bin_path, 
                                                   model, 
                                                   T_velo_cam,
-                                                  draw_boxes=False)
+                                                  draw_boxes=False,
+                                                  draw_depth=False)
 
      # get transformed coordinates of object centers
      uvz = bboxes[:, -3:]
