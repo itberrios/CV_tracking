@@ -1,6 +1,6 @@
 # Object Tracking Tutorial
 
-This tutorial will include notebooks for simple 3D object tracking. 
+This tutorial will include notebooks for simple 3D object tracking. We will leverage the KITTI dataset for this tutorial series, the left RGB camera and the LiDAR will be fused to detect objects in 3D space. The objects are detected in 3D can then be tracked using the Hungarian Algorith or Hungarian Algorith + Kalman Filter (3D SORT).
 
 
 - 0_kitti_gps_imu - Overview of the KITTI dataset
