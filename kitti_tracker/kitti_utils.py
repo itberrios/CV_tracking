@@ -30,7 +30,6 @@ def get_oxts(oxt_path):
 # time functions
 get_total_seconds = lambda hms: hms[0]*60*60 + hms[1]*60 + hms[2]
 
-
 def timestamps2seconds(timestamp_path):
     ''' Reads in timestamp path and returns total seconds (does not account for day rollover '''
     timestamps = pd.read_csv(timestamp_path, 
@@ -39,16 +38,15 @@ def timestamps2seconds(timestamp_path):
                                           .apply(lambda x: x.split(' ')[1]) 
     
     # Get Hours, Minutes, and Seconds
-    hours = ser.apply(lambda x: x.split(':')[0]).astype(np.float64)
-    minutes = ser.apply(lambda x: x.split(':')[1]).astype(np.float64)
-    seconds = ser.apply(lambda x: x.split(':')[2]).astype(np.float64)
+    hours = timestamps.apply(lambda x: x.split(':')[0]).astype(np.float64)
+    minutes = timestamps.apply(lambda x: x.split(':')[1]).astype(np.float64)
+    seconds = timestamps.apply(lambda x: x.split(':')[2]).astype(np.float64)
 
     hms_vals = np.vstack((hours, minutes, seconds)).T
     
     total_seconds = np.array(list(map(get_total_seconds, hms_vals)))
     
     return total_seconds
-
 # ============================================================================================
 # file access functions
 
