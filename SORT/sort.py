@@ -222,6 +222,24 @@ class Sort():
             """
         self.frame_count += 1
 
+        # get predicted locations from existing trackers.
+        # trks = np.zeros((len(self.tracks), 5))
+        # to_del = []
+        # ret = []
+        # for t, trk in enumerate(trks):
+        #     pos = self.trackers[t].predict()[0]
+        #     trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
+        #     if np.any(np.isnan(pos)):
+        #         to_del.append(t)
+        # trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
+        # for t in reversed(to_del):
+        #     self.trackers.pop(t)
+
+        # update track locations
+        for t, trk in enumerate(self.tracks):
+            trk.predict()
+
+
         # get bounding boxes for currently tracked objects
         old_bboxes = np.array([trk.box for trk in self.tracks])
 
@@ -259,10 +277,3 @@ class Sort():
         if(len(ret)>0):
             return np.concatenate(ret)
         return np.empty((0,5))
-
-
-
-
-
-      
-      
