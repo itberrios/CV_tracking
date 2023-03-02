@@ -171,7 +171,7 @@ class Obstacle():
         self.kf.Q[-1,-1] *= 0.01
         self.kf.Q[4:,4:] *= 0.01
         # get initial state
-        self.kf.x[:4] = convert_bbox_to_z(trk.box)
+        self.kf.x[:4] = convert_bbox_to_z(box)
 
 
     def update(self, bbox):
