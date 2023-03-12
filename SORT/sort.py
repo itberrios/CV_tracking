@@ -274,6 +274,6 @@ class Sort():
             # remove dead tracklet
             if(trk.time_since_update > self.max_age):
                 self.tracks.pop(i)
-        if(len(ret)>0):
+        if(len(current_tracks)>0):
             return np.concatenate(current_tracks)
         return np.empty((0,5))
