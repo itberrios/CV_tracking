@@ -264,16 +264,16 @@ class Sort():
             self.tracks[t_idx].hit_streak = 0
 
         # manage tracks
-        ret = []
+        current_tracks = []
         i = len(self.tracks)
         for trk in reversed(self.tracks):
             d = trk.get_state()[0]
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
-                ret.append(np.concatenate((d,[trk.id+1])).reshape(1,-1)) # +1 as MOT benchmark requires positive
+                current_tracks.append(np.concatenate((d,[trk.id+1, trk.cat])).reshape(1,-1)) # +1 as MOT benchmark requires positive
             i -= 1
             # remove dead tracklet
             if(trk.time_since_update > self.max_age):
                 self.tracks.pop(i)
         if(len(ret)>0):
-            return np.concatenate(ret)
+            return np.concatenate(current_tracks)
         return np.empty((0,5))
