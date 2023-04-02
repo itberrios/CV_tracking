@@ -17,7 +17,7 @@ Since MARLMOT is a simple model that directly observes each track it is able to 
 
 
 ## Implementation (TBD)
-See the following [blog post](https://medium.com/@itberrios6/marlmot-4f018282e0cc) for more information about the original implementation. This implementation of MARLMOT is slightly different than the original. 
+This implementation is slightly different than the original, see [this](https://medium.com/@itberrios6/marlmot-4f018282e0cc) for more information about the original implementation. 
 
 The Joint combinations of actions taken by N agents is intractable, so each agent is parameterized by the same policy. The rewards are computed every frame and are based off of multiple object tracking metrics. During training, the same policy is used to sample actions for each observation and at each frame the same rewards are given to each agent. In this manner all of the agents are incentivized to cooporatively track all targets.
 
