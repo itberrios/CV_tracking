@@ -37,8 +37,7 @@ To evaluate a trained policy/actor model and print metrics, run "eval.py". Updat
 A simulated version of SORT can be evaluated from comparison when mode is set to "SORT". Since MARLMOT is built upon SORT, the actions in this mode always default to a3 with probability of 1. <br>
 ```eval.py  --mode SORT ```
 
-##### NOTE: 
-Evaluating in SORT mode is an effective way to quantify alogorithm changes/tweaks that do not directly depend on MARLMOT
+##### NOTE: Evaluating in SORT mode is an effective way to quantify algorithm changes that are not directly related to MARLMOT
 
 ## Inference
 To run inferences on either training or test data, inference.py can be called from the commandline which will create a video of all tracks
