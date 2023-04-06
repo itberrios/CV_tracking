@@ -121,7 +121,7 @@ class TrainWorld():
         self.missed_tracks, \
         _                = associate(self.truth_bboxes, 
                                      current_track_bboxes, 
-                                     thresh=1e-4)
+                                     thresh=0.3)
     
 
     def _get_mismatch_errors(self):
@@ -184,6 +184,7 @@ class TrainWorld():
 
         return -reward
     
+    
 
     def iterate_frame(self):
         """ obtains state/observations at the next frame """
@@ -214,42 +215,22 @@ class TrainWorld():
         observations = {}
         for track in self.current_tracks:
             obs = track.observation
+
             # normalize obsrvations
             obs[0] /= self.frame_size[1] # xpos
             obs[1] /= self.frame_size[0] # ypos
             obs[2] /= area_norm # area
-            obs[4] /= self.frame_size[1] # xvel
-            obs[5] /= self.frame_size[0] # yvel
-            obs[6] /= area_norm # area vel
+            obs[4] = sigmoid(obs[4] / self.frame_size[1]) # xvel
+            obs[5] = sigmoid(obs[5] / self.frame_size[0]) # yvel
+            obs[6] = sigmoid(obs[6] / area_norm) # area vel
 
-            obs[7] /= self.frame_size[1] # detected xpos
-            obs[8] /= self.frame_size[0] # detected ypos
-            obs[9] /= area_norm # detected area
+            obs[7]  /= self.frame_size[1] # detected xpos
+            obs[8]  /= self.frame_size[0] # detected ypos
+            obs[9]  /= area_norm # detected area
 
             # normalize between 0-1
             obs[16] = sigmoid(obs[16] - 3) # frames since last association
             obs[17] = sigmoid(obs[17] - 3) # hit streak
-
-            # new
-            # ensure that positions are roughly 0 centered
-            obs[0] = obs[0] - 0.5 # xpos
-            obs[1] = obs[1] - 0.5 # ypos
-            obs[7] = obs[7] - 0.5 # detected xpos
-            obs[8] = obs[8] - 0.5 # detected ypos
-
-            # old
-            # # ensure that all velocities are 0 - 1 (or at least positive!)
-            # obs[4] = sigmoid(obs[4]) # xvel
-            # obs[5] = sigmoid(obs[5]) # yvel
-            # obs[6] = sigmoid(obs[6]) # area vel
-
-            # new
-            # instead ensure that velocities are large enough to to be meaningful
-            obs[4] = obs[4] * 4 # xvel
-            obs[5] = obs[5] * 4 # yvel
-            obs[6] = obs[6] * 4 # area vel
-
-            # or maybe not
 
             # track ID maps to observation
             observations.update({track.id : obs})
@@ -270,6 +251,8 @@ class TrainWorld():
                 track - updated trackfile object
             """
         # terminate track
+        # possibly use a min_age here to determine if the track can be deleted
+        # or pass track age to MARLMOT
         if action == 0:
             # reset track to inactive
             track.track_mode = 0 

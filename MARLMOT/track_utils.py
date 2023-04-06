@@ -136,7 +136,6 @@ def associate(old_boxes, new_boxes, thresh=0.3):
     
     return matches, unmatched_detections, unmatched_tracks, cost_matrix
 
-
 # obstacle class
 class Obstacle():
     count = 0
@@ -306,8 +305,7 @@ class HungarianTracker():
             # remove tracks that have been marked for deletion (age = -1)
             if track.age >= 0:
                 old_bboxes.append(track.predict()[0]) # always make a prediction
-                # old_bboxes.append(track.get_state()[0]) # don't predict, let MARLMOT decide to predict or not
-
+                
         # associate boxes to known tracks
         matches, \
         unmatched_detections, \
@@ -325,10 +323,6 @@ class HungarianTracker():
             track.detection = np.vstack((convert_bbox_to_z(bbox), 
                                          detections[m[1], 5], # confidence score
                                          cost))
-            # don't update bbox, let MARLMOT decide this
-            # track.update(bbox) 
-            # maybe update all bboxes if track hasn't yet reached the min_age?
-            
             tracks.append(self.tracks[m[0]])
 
         # get new tracks 
@@ -349,11 +343,7 @@ class HungarianTracker():
         for t in unmatched_tracks:
             track = self.tracks[t]
             track.detection = 0
-
-            # maybe update all bboxes if track hasn't yet reached the min_age?
-
             unmatched_tracks.append(track)
-
 
         # update tracks list with all tracks
         self.tracks = tracks + new_tracks + unmatched_tracks

@@ -4,6 +4,7 @@
     script is intended to evaluate the results on all videos in the
     MOT15 training split.
 """
+import os
 import argparse
 import numpy as np
 import torch
@@ -14,6 +15,7 @@ from network import Net
 from ppo import PPO
 from track_utils import *
 
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 def get_args():
     """
@@ -25,9 +27,9 @@ def get_args():
 
     # set default paths here
     parser.add_argument("--policy", dest="policy", type=str,
-                        default=r"C:\Users\itber\Documents\learning\self_tutorials\cv_tracking_gym\models\actor_1161.pth") 
+                        default=os.path.join(DIR_PATH, "trained_models\actor_1161.pth"))
     parser.add_argument("--datafolder", dest="datafolder", type=str, 
-                        default=r"C:\Users\itber\Documents\datasets\MOT15\train")
+                        default=r"C:\Users\itber\Documents\datasets\MOT15\test")
     parser.add_argument("--mode", dest="mode", type=str, default="marlmot")
     parser.add_argument("--iou_threshold", dest="iou_threshold", type=float, default=0.3)
     parser.add_argument("--min_age", dest="min_age", type=int, default=1)
@@ -77,13 +79,13 @@ def get_sort_rollout(dataloader, iou_threshold, min_age):
     batch_actions = []
     batch_logprobs = []
     batch_rewards = []
-    batch_rtgs = []
 
     # store metrics
     num_false_positives = 0
     num_false_negatives = 0
     num_mismatch_errrors = 0
     cost_penalties = 0
+    total_num_tracks = 0
 
     for (ground_truth, detections, frame_size) in dataloader:
         
@@ -97,6 +99,9 @@ def get_sort_rollout(dataloader, iou_threshold, min_age):
 
         # initialize episode rewards list
         ep_rewards = []
+
+        # accumulate total number of tracks
+        total_num_tracks += len(ground_truth)
 
         # take initial step to get first observations
         observations, _, _ = world.step({})
@@ -129,11 +134,16 @@ def get_sort_rollout(dataloader, iou_threshold, min_age):
             if done:
                 break
 
+    mota = 1 - ((num_false_positives 
+                     + num_false_negatives 
+                     + num_mismatch_errrors)) / total_num_tracks
+
     metrics = (len(batch_obs), 
                num_false_positives, 
                num_false_negatives, 
                num_mismatch_errrors, 
-               cost_penalties)
+               cost_penalties,
+               mota)
 
     return metrics
 
@@ -146,9 +156,10 @@ def eval_sort(dataloader, iou_threshold, min_age):
     false_positives, \
     false_negatives, \
     mismatch_errrors, \
-    cost_penalty = get_sort_rollout(dataloader, 
-                                    iou_threshold, 
-                                    min_age)
+    cost_penalty, \
+    mota = get_sort_rollout(dataloader, 
+                            iou_threshold, 
+                            min_age)
     
     # display metrics
     print("batch length: ", batch_len)
@@ -156,6 +167,11 @@ def eval_sort(dataloader, iou_threshold, min_age):
     print("false negatives: ", false_negatives)
     print("mismatch errrors: ", mismatch_errrors)
     print("cost penalty: ", cost_penalty.round(4).squeeze())
+    print("total: ", false_positives 
+                     + false_negatives 
+                     + mismatch_errrors 
+                     + cost_penalty.round(4).squeeze())
+    print("MOTA: ", mota)
 
 
 def eval_marlmot(dataloader, policy_path, iou_threshold, min_age):
@@ -178,12 +194,23 @@ def eval_marlmot(dataloader, policy_path, iou_threshold, min_age):
     batch_obs, _, _, _ = ppo.batch_rollout()
 
     # display metrics
+    false_positives = ppo.metrics["false_positives"][0]
+    false_negatives = ppo.metrics["false_negatives"][0]
+    mismatch_errrors = ppo.metrics["mismatch_errrors"][0]
+    cost_penalty = ppo.metrics["cost_penalty"][0].round(4).squeeze()
+    mota = ppo.metrics["mota"][0]
+
     print("batch length: ", len(batch_obs))
     print("action ratios: ", np.array(ppo.metrics["action_ratios"]).round(4).squeeze())
-    print("false positives: ", ppo.metrics["false_positives"][0])
-    print("false negatives: ", ppo.metrics["false_negatives"][0])
-    print("mismatch errrors: ", ppo.metrics["mismatch_errrors"][0])
-    print("cost penalty: ", ppo.metrics["cost_penalty"][0].round(4).squeeze())
+    print("false positives: ", false_positives)
+    print("false negatives: ", false_negatives)
+    print("mismatch errrors: ", mismatch_errrors)
+    print("cost penalty: ", cost_penalty)
+    print("total: ", false_positives 
+                     + false_negatives 
+                     + mismatch_errrors 
+                     + cost_penalty)
+    print("MOTA: ", mota)
 
 
 if __name__ == "__main__":

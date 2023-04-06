@@ -14,6 +14,8 @@ from network import Net
 from ppo import PPO
 from track_utils import *
 
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+
 
 def get_args():
     """
@@ -25,16 +27,16 @@ def get_args():
 
     # set default path here
     parser.add_argument("--policy", dest="policy", type=str,
-                        default=r"C:\Users\itber\Documents\learning\self_tutorials\cv_tracking_gym\models\actor_1161.pth") 
+                        default=os.path.join(DIR_PATH, r"trained_models\actor_1161.pth"))
     parser.add_argument("--datafolder", dest="datafolder", type=str, 
                         default=r"C:\Users\itber\Documents\datasets\MOT15\test")
     parser.add_argument("--savepath", dest="savepath", type=str,
-                        default=r"C:\Users\itber\Documents\learning\school\ESE559\project\marlmot\inference") 
+                        default=os.path.join(DIR_PATH, "inference"))
     parser.add_argument("--idx", dest="idx", type=int, default=0)
     parser.add_argument("--iou_threshold", dest="iou_threshold", type=float, default=0.3)
     parser.add_argument("--min_age", dest="min_age", type=int, default=1)
     parser.add_argument("--video", dest="video", type=bool, choices=[True, False], default=True)
-    parser.add_argument("--device", dest="device", type=str, default=r"cpu") 
+    parser.add_argument("--device", dest="device", type=str, choices=["cuda", "cpu"], default=r"cpu") 
     args = parser.parse_args()
 
     return args
@@ -61,7 +63,7 @@ def draw_tracks(frame, tracks):
         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 3)
 
         # draw track info
-        label = f"{track.cat}_{track.id}_{track.age}"
+        label = f"{track.id}_{track.age}"
 
         frame = cv2.putText(frame, label, (x1 + 10, y1 + 10), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, 
@@ -71,6 +73,7 @@ def draw_tracks(frame, tracks):
 
 
 if __name__ == "__main__":
+
     # parse arguments
     args = get_args()
     policy_path = args.policy
@@ -132,9 +135,7 @@ if __name__ == "__main__":
 
         if done:
             break
-    
-    for track in world.current_tracks:
-        print(track.observation)
+
 
     if make_video:
         video_path = os.path.join(savepath, 
@@ -144,9 +145,9 @@ if __name__ == "__main__":
         frame_rate = dataloader.get_frame_rate(dataloader.data_paths[idx])
 
         out = cv2.VideoWriter(video_path, 
-                            cv2.VideoWriter_fourcc(*'mp4v'), 
-                            frame_rate, 
-                            frame_size[::-1])
+                              cv2.VideoWriter_fourcc(*'mp4v'), 
+                              frame_rate, 
+                              frame_size[::-1])
 
         for frame in video_frames:
             out.write(frame)

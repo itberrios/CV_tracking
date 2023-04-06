@@ -22,12 +22,9 @@ class Net(nn.Module):
         self.fc4 = nn.Linear(32, output_dim)
 
     def forward(self, x):
-        # x = F.elu(self.fc1(x))  
-        # x = F.elu(self.fc2(x))
-        # x = F.elu(self.fc3(x))
-        x = F.mish(self.fc1(x))  
-        x = F.mish(self.fc2(x))
-        x = F.mish(self.fc3(x))
+        x = F.elu(self.fc1(x))  
+        x = F.elu(self.fc2(x))
+        x = F.elu(self.fc3(x))
         x = self.fc4(x)
 
         # return logits and compute softmax with loss function?

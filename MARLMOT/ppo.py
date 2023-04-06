@@ -1,5 +1,7 @@
 """
     Custom PPO implementation
+
+    TODO: implement early stopping upon convergence
 """
 
 import os
@@ -18,8 +20,8 @@ from track_utils import *
 
 class PPO():
     def __init__(self, dataloader, env, policy_model, epochs, num_train_iters=4, 
-                 lr=1e-4, gamma=0.95, eps=0.2, iou_threshold=0.3, min_age=1, 
-                 device=None, obs_dim=18, action_dim=5):
+                 lr=1e-4, gamma=0.95, eps=0.2, iou_threshold=0.3, min_age=3, 
+                 device=None, checkpoint=50, obs_dim=18, action_dim=5):
         """
             Custom Class for Proximal Policy Optimization for MARLMOT
             Assumes a continuous observation space and a discrete action space.
@@ -37,6 +39,7 @@ class PPO():
                 min_age - miniumum age for a track to be considered valid
                 iou_threshold - min IOU threshold for track association
                 device - device to perform inference on (defaults to GPU if available)
+                checkpoint - number of epochs to sa
                 obs_dim - observation dimensions
                 action_dim - action dimensions
         """
@@ -49,6 +52,7 @@ class PPO():
         self.eps = eps
         self.iou_threshold = iou_threshold
         self.min_age = min_age
+        self.checkpoint = checkpoint if checkpoint else epochs
 
         # store training metrics
         self.metrics = {
@@ -57,6 +61,7 @@ class PPO():
              "false_negatives" : [], # total number of false negatives (missed tracks) per batch
             "mismatch_errrors" : [], # total number of mismatch errors per batch
                 "cost_penalty" : [], # total cost of all matches per batch (smaller is better)
+                        "mota" : [], # multiple object tracking accuracy
                    "approx_kl" : []  # approximate KL divergence
         }
 
@@ -112,8 +117,8 @@ class PPO():
             # detach from gradient important for computing actor loss
             A_k = batch_rtgs - V.detach() 
 
-            # normalize advantages
-            A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
+            # standardize advantages
+            # A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
 
             ## Optimize actor and critic for n steps
             # can't do too many steps or assumptions of similar distributions will fail
@@ -174,7 +179,15 @@ class PPO():
                 torch.save(self.actor.state_dict(), 
                            os.path.join(savepath, f"actor_{epoch}.pth"))
 
-        # also save logger to savepath
+            if savepath and ((epoch + 1) % self.checkpoint == 0):
+                self.save_logger(savepath)
+                self.save_hyperparameters(savepath)
+                self.save_metrics(savepath)
+
+        # # save final 
+        # self.save_logger(savepath)
+        # self.save_hyperparameters(savepath)
+        # self.save_metrics(savepath)
 
 
     def batch_rollout(self):
@@ -209,6 +222,7 @@ class PPO():
         num_false_negatives = 0
         num_mismatch_errrors = 0
         cost_penalties = 0
+        total_num_tracks = 0 # total number of gt tracks for all frames
 
         for (ground_truth, detections, frame_size) in self.dataloader:
             
@@ -222,6 +236,9 @@ class PPO():
 
             # initialize episode rewards list
             ep_rewards = []
+
+            # accumulate total number of tracks for mota
+            total_num_tracks += len(ground_truth)
 
             # take initial step to get first observations
             observations, _, _ = world.step({})
@@ -263,11 +280,16 @@ class PPO():
                                                   return_counts=True)
         action_ratios[unique_actions] = action_counts/len(batch_actions)
 
+        mota = 1 - ((num_false_positives 
+                     + num_false_negatives 
+                     + num_mismatch_errrors)) / total_num_tracks
+
         self.metrics["action_ratios"].append(action_ratios)
         self.metrics["false_positives"].append(num_false_positives)
         self.metrics["false_negatives"].append(num_false_negatives)
         self.metrics["mismatch_errrors"].append(num_mismatch_errrors)
         self.metrics["cost_penalty"].append(cost_penalties)
+        self.metrics["mota"].append(mota)
 
         # convert everything to float32 torch tensors and place them on the device
         batch_obs = torch.tensor(np.array(batch_obs).squeeze(), 
