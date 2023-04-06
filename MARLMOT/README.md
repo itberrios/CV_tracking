@@ -34,7 +34,7 @@ To evaluate a trained policy/actor model and print metrics, run "eval.py". Updat
 ```eval.py``` <br>
 ```eval.py --policy path\to\trained\policy --datafolder path\tp\mot15\data --mode MARLMOT ``` <br>
 
-A simulated version of SORT can be evaluated from comparison when mode is set to "SORT". Since MARLMOT is built upon SORT, the actions in this mode always default to a3 with probability of 1. <br>
+A simulated version of SORT can be evaluated from comparison when mode is set to "SORT". Since MARLMOT is built upon SORT, the actions in this mode always default to a3 with probability of 1. (This is not exactly like SORT, but provides a nice easy comparison of the naive optimal policy). <br>
 ```eval.py  --mode SORT ```
 
 ##### NOTE: Evaluating in SORT mode is an effective way to quantify algorithm changes that are not directly related to MARLMOT
