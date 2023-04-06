@@ -16,14 +16,14 @@ Since MARLMOT is a simple model that directly observes each track it is able to 
 </p>
 
 
-## Implementation (TBD)
+## Implementation 
 This implementation is slightly different than the original, see [this](https://medium.com/@itberrios6/marlmot-4f018282e0cc) for more information about the original implementation. 
 
 The Joint combinations of actions taken by N agents is intractable, so each agent is parameterized by the same policy. The rewards are computed every frame and are based off of multiple object tracking metrics. During training, the same policy is used to sample actions for each observation and at each frame the same rewards are given to each agent. In this manner all of the agents are incentivized to cooporatively track all targets.
 
 
 ## Training
-The original model was trained with [MOT15](https://motchallenge.net/data/MOT15/) data. To train the model from scratch either specify the paths to the MOT15 train folder and savepaths in the train.py file or pass them as arguments. <br>
+The original model was trained with [MOT15](https://motchallenge.net/data/MOT15/) data using Trust Region Policy Optimization, this version uses Proximal Policy Optimization. To train the model from scratch either specify the paths to the MOT15 train folder and savepaths in the train.py file or pass them as arguments. <br>
 ```train.py``` <br>
 ``` train.py --trainfolder path\to\mot15\trainfolder --savepath path\to\save\models ```
 
